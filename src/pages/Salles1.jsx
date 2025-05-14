@@ -1,72 +1,86 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import SalleCard from "../components/SalleCard";
 import ButtonPrimary from "../components/buttonPrimary";
+import gymAPI from "../api/gymsAPI";
+import heroBgImage from "/images/salles1-hero.png";
+
+// Import fallback images
 import salle1Image from "/images/salle-1.png";
 import salle2Image from "/images/salle-2.png";
 import salle3Image from "/images/salle-3.png";
 import salle4Image from "/images/salle-4.png";
 import salle5Image from "/images/salle-5.png";
 import salle6Image from "/images/salle-6.png";
-import heroBgImage from "/images/salles1-hero.png";
 
+// Fallback images array
+const fallbackImages = [salle1Image, salle2Image, salle3Image, salle4Image, salle5Image, salle6Image];
 
-const SALLES = [
-  {
-    salleName: "POWERFIT GYM",
-    salleImage: salle1Image,
-    hourPrice: "0",
-    salleServices: ["Musculation", "Cardio", "CrossFit"],
-    salleHours: "06h00 - 23h00 (7j/7)",
-    salleAddress: "Annaba , Algerie",
-  },
-  {
-    salleName: "ELITE TRAINING ",
-    salleImage: salle2Image,
-    hourPrice: "0",
-    salleServices: ["Cours collectifs", "Boxe", "Fitness"],
-    salleHours: "07h00 - 22h00 (6j/7)",
-    salleAddress: "Alger , Algerie",
-  },
-  {
-    salleName: "SPARTAN GYM",
-    salleImage: salle3Image,
-    hourPrice: "0",
-    salleServices: ["Haltérophilie", "CrossFit", "Coaching personnalisé"],
-    salleHours: "08h00 - 21h00 (6j/7)",
-    salleAddress: "Oran , Algerie",
-  },
-  {
-    salleName: "TITANS FITNESS ",
-    salleImage: salle4Image,
-    hourPrice: "0",
-    salleServices: ["Musculation", "Cardio", "Piscine"],
-    salleHours: "06h30 - 22h30 (7j/7)",
-    salleAddress: "Tizi-Ouzou , Algerie",
-  },
-  {
-    salleName: "OXYGEN FITNESS",
-    salleImage: salle5Image,
-    hourPrice: "0",
-    salleServices: ["Fitness", "Zumba", "Yoga"],
-    salleHours: "06h30 - 22h30 (7j/7)",
-    salleAddress: "Bejaia , Algerie",
-  },
-  {
-    salleName: "Mehdi Rahman",
-    salleImage: salle6Image,
-    hourPrice: "0",
-    salleServices: ["MMA" , "Boxe" , "Musculation"],
-    salleHours:"06h30 - 22h30 (7j/7)",
-    salleAddress: "Boumerdes , Algerie",
-  },
-];
 function Salles1Page() {
+  const [gyms, setGyms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Function to fetch gyms from API
+    const fetchGyms = async () => {
+      try {
+        setIsLoading(true);
+        const response = await gymAPI.getAllGyms();
+        
+        // Map the API response to match your component props
+        const formattedGyms = response.data.map((gym, index) => {
+          // Format operating hours string from the schedule object
+          const formatHoraires = (horaires) => {
+            if (!horaires) return "Horaires non disponibles";
+            
+            // Get earliest opening and latest closing
+            const earliestOpening = Object.values(horaires)
+              .map(day => day.ouverture)
+              .sort()[0];
+              
+            const latestClosing = Object.values(horaires)
+              .map(day => day.fermeture)
+              .sort()
+              .reverse()[0];
+              
+            return `${earliestOpening} - ${latestClosing} (7j/7)`;
+          };
+          
+          return {
+            id: gym._id,
+            salleName: gym.nom,
+            salleImage: gym.images && gym.images.length > 0 
+              ? gym.images[0] 
+              : fallbackImages[index % fallbackImages.length],
+            hourPrice: "0", // Add price field if available in your model later
+            salleServices: gym.equipements || [],
+            salleHours: formatHoraires(gym.horaires),
+            salleAddress: gym.localisation ? 
+              `${gym.localisation.ville}, ${gym.localisation.pays}` : 
+              "Adresse non disponible",
+            description: gym.description || "Aucune description disponible"
+          };
+        });
+        
+        setGyms(formattedGyms);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch gyms:", err);
+        setError("Impossible de charger les salles. Veuillez réessayer plus tard.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGyms();
+  }, []);
+
   return (
-    <div className=" overflow-x-clip">
+    <div className="overflow-x-clip">
       <div
-        className=" pb-43"
+        className="pb-43"
         style={{
           backgroundImage: `url(${heroBgImage})`,
           backgroundSize: "cover",
@@ -75,18 +89,17 @@ function Salles1Page() {
       >
         <Header isConnected={true}></Header>
         <section className="mt-20">
-          <h2 className="heading-1 text-center  max-w-[1200px] mx-auto">
+          <h2 className="heading-1 text-center max-w-[1200px] mx-auto">
             TROUVEZ IDÉALE
             <span className="text_gradient"> LA SALLE DE SPORT</span> POUR
             ATTEINDRE VOS OBJECTIFS !
           </h2>
           <p className="paragraph-2 max-w-[1000px] mx-auto mt-30">
-            Des coachs certifiés, des résultats garantis. Que vous soyez
-            débutant ou athlète confirmé, trouvez le coach qui vous convient
+            Des équipements modernes, des espaces adaptés à vos besoins.
+            Trouvez la salle qui correspond à votre style d'entraînement
           </p>
-          <ButtonPrimary buttonClassName="mx-auto mt-20 ">
+          <ButtonPrimary buttonClassName="mx-auto mt-20">
             <a href="#lar">Trouver ma salle idéale</a>
-           
           </ButtonPrimary>
         </section>
       </div>
@@ -94,25 +107,47 @@ function Salles1Page() {
       <section id="lar">
         <div
           className="w-full h-74 bg-background absolute top-10 -translate-y-1/2 -z-10"
-          style={
-            {
-              filter: "blur(60px)",
-            }
-          }
+          style={{
+            filter: "blur(60px)",
+          }}
         ></div>
-        <div className="grid grid-cols-3 rounded-[40px] bg-primary/20 p-10 gap-10 max-w-[1264px] mx-auto">
-          {SALLES.map((salle, index) => (
-            <SalleCard
-              key={index}
-              salleName={salle.salleName}
-              salleImage={salle.salleImage}
-              salleServices={salle.salleServices}
-              salleAddress={salle.salleAddress}
-              salleHours={salle.salleHours}
-              hourPrice={salle.hourPrice}
-            ></SalleCard>
-          ))}
-        </div>
+        
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 max-w-[1264px] mx-auto">
+            {error}
+          </div>
+        )}
+        
+        {/* Loading state */}
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 rounded-[40px] bg-primary/20 p-10 gap-10 max-w-[1264px] mx-auto">
+            {gyms.length > 0 ? (
+              gyms.map((salle, index) => (
+                <SalleCard
+                  key={salle.id || index}
+                  salleId={salle.id}
+                  salleName={salle.salleName}
+                  salleImage={salle.salleImage}
+                  salleServices={salle.salleServices}
+                  salleAddress={salle.salleAddress}
+                  salleHours={salle.salleHours}
+                  hourPrice={salle.hourPrice}
+                  description={salle.description}
+                />
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-10">
+                <p className="text-xl text-gray-400">Aucune salle disponible pour le moment</p>
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="bg-primary py-2 px-4 mt-15 mx-auto w-fit rounded-full">
           <a
             href="Salles2"
@@ -122,7 +157,7 @@ function Salles1Page() {
           </a>
         </div>
       </section>
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 }
