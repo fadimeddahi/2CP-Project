@@ -19,6 +19,7 @@ import Dashboard from "./pages/Dashboard";
 import Proprs from "./pages/Proprs";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GymDetail from "./pages/GymDetail";
+import CoachDetail from "./pages/CoachDetail";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/crier-mon-compte" element={<Registration/>} />
           <Route path="/gym/:id" element={<GymDetail />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/coach/:id" element={<CoachDetail />} />
           
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
