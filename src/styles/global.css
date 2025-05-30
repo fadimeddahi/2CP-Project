@@ -1,0 +1,84 @@
+@import "tailwindcss"; 
+
+@layer base {
+    html {
+        color: white;
+    }
+}
+
+@theme {
+    --font-Montserrat:var(--font-Montserrat);
+    --font-Roboto:var(--font-Roboto);
+    --color-background:rgba(var(--background));
+    --color-primary:rgba(var(--primary));
+    --color-secondary:rgba(var(--secondary));
+    --font-Poppins:var(--font-Poppins);
+    /* --animate-to-right:animateToRight 1s linear 1; */
+}
+/* @keyframes animateToRight {
+    from {
+        left:120px;
+        right: auto;
+    }
+    to {
+        left: auto; 
+        right: 120px;
+    }
+} */
+
+:root {
+    --font-Montserrat:["Montserrat","sans-serif"];
+    --font-Roboto:["Roboto","sans-serif"];
+    --font-Poppins:["Poppins","sans-serif"];
+    --background:11,21,40,1;
+    --primary:66,250,207,1;
+    --secondary:66,192,250,1;
+}
+
+@utility border_gradient {
+    background:
+            linear-gradient(var(--color-background), var(--color-background)) padding-box,
+            linear-gradient(to right, var(--color-primary), var(--color-secondary)) border-box;
+    border: var(--gradient-border-width,4px) solid transparent;
+    
+}
+@utility text_gradient {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent
+}
+@layer components {
+    .heading-1 {
+        @apply font-Montserrat font-bold text-white ;
+        font-size: var(--font-size,70px);
+        line-height: var(--line-height,80px);
+        letter-spacing:var(--letter-spacing,0.05em);
+    }
+    .heading-2 {
+        @apply font-Montserrat font-bold text_gradient ;
+        font-size: var(--font-size,60px);
+        line-height: var(--line-height,110px);
+        letter-spacing:var(--letter-spacing,0.05em);
+    }
+    .paragraph-1 {
+        @apply font-Roboto text-white ;
+        font-size: var(--font-size,34.34px);
+        line-height: var(--line-height,46.1px);
+        letter-spacing: var(--letter-spacing,0.05em);
+    }
+    .paragraph-2 {
+        @apply font-Montserrat font-bold text-3xl leading-10 tracking-wider text-center text-white;
+    }
+}
+.connexion-bg-gradient {
+    background: linear-gradient(90deg, rgba(11, 21, 40, 0.8) 0%, rgba(66, 192, 250, 0.8) 48.5%, rgba(66, 250, 207, 0.8) 100%);
+}
+.connexion-box {
+                background: rgba(217,217, 217, 0.134);
+                border: 1px solid #42FACF;
+                box-shadow: 5px 40px 50px rgba(0, 0, 0, 0.25), inset 49.5333px -49.5333px 49.5333px #a5a5a522, inset -49.5333px 49.5333px 49.5333px rgba(255, 255,
+                        255, 0.134);
+                backdrop-filter: blur(67.8607px);
+                border-radius: 55px;
+}
+html {
+    scroll-behavior: smooth;
+  }
